@@ -3,15 +3,20 @@ import sqlite3
 from sqlite3 import Error
 from rich import print
 from datetime import datetime
+from pathlib import Path
+
+def get_module_path():
+    return Path(__file__).parent
 
 def generate_id():
     return str(uuid.uuid4())
 
 def init(db):
     """create a database connection to a SQLite database"""
+    mod_path = get_module_path()
     try:
         conn = sqlite3.connect(
-                db, 
+                mod_path/db, 
                 detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         return conn
     except Error as e:

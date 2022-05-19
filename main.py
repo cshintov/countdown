@@ -5,14 +5,17 @@ Show countdown to an event.
 import time
 from datetime import date
 from datetime import datetime
-
 from operator import itemgetter
-from rich.progress import Progress
+
 from rich import print
+from rich.progress import Progress
+from rich.console import Console
+from rich.table import Table
 
 from db import init, get_event
 
 SECONDS_IN_A_DAY = 10 #86400
+
 
 def destructure(dict_, *keys):
     return itemgetter(*keys)(dict_)
@@ -56,8 +59,26 @@ def show_progress_of_an_event(id_):
     start, end, interval = event[2], event[3], event[4]
     days_remaining, days_gone, days_total = split_time(start, end)
 
-    print(f'{days_total=} {days_gone=} {days_remaining=}')
-    show_progress(days_gone, days_total, interval)
+    show_progress_table(
+            str(days_remaining), str(days_gone), str(days_total))
+
+    try:
+        show_progress(days_gone, days_total, interval)
+    except KeyboardInterrupt:
+        print('Stopped!')
+
+
+def show_progress_table(remaining, gone, total):
+    table = Table(title="Progress")
+
+    table.add_column("Remaining", style="cyan", no_wrap=True)
+    table.add_column("Gone", style="magenta")
+    table.add_column("Total", justify="right", style="green")
+
+    table.add_row(remaining, gone, total)
+
+    console = Console()
+    console.print(table)
 
 if __name__ == '__main__':
-    show_progress_of_an_event('b141fe02-c017-43ee-9bd4-382aab9a13cd')
+    show_progress_of_an_event('f988597e-8683-4f38-b279-aae146d3e0d9')
